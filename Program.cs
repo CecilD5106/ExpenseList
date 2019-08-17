@@ -14,9 +14,16 @@ namespace ExpenseList
             //Set Variables
             string path = "E:\\Excel\\Bank Accounts.xlsx";
             Application excel = new Application();
-
+            Workbook wb = excel.Workbooks.Open(path);
+            List<string> sTabs = new List<string>(new string[] { "Major Bills", "Family", "Savings", "Stock", "Visa" });
             try
             {
+                foreach (string sTab in sTabs)
+                {
+                    Worksheet ws = wb.Worksheets[sTab];
+                    Worksheet wsExp = wb.Worksheets["Expenses"];
+                }
+                wb.Save();
                 excel.Quit();
             }
             catch (Exception)
