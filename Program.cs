@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 
+//Program to total expenses by category per month
 namespace ExpenseList
 {
     class Program
@@ -34,6 +35,7 @@ namespace ExpenseList
                 InsuranceLife = 0.00;
                 InterestCharged = 0.00;
                 LicensingAuto = 0.00;
+                LicensingProfessional = 0.00;
                 MaintenanceAuto = 0.00;
                 MaintenanceHome = 0.00;
                 Medical = 0.00;
@@ -84,6 +86,7 @@ namespace ExpenseList
             public double InsuranceLife { get; private set; }
             public double InterestCharged { get; private set; }
             public double LicensingAuto { get; private set; }
+            public double LicensingProfessional { get; private set; }
             public double MaintenanceAuto { get; private set; }
             public double MaintenanceHome { get; private set; }
             public double Medical { get; private set; }
@@ -182,6 +185,9 @@ namespace ExpenseList
                     case "Licensing - Auto":
                         LicensingAuto += dExpense;
                         break;
+                    case "Licensing - Professional":
+                        LicensingProfessional += dExpense;
+                        break;
                     case "Maintenance - Auto":
                         MaintenanceAuto += dExpense;
                         break;
@@ -272,35 +278,48 @@ namespace ExpenseList
                 DateTime dtEnd = Convert.ToDateTime(Console.ReadLine());
                 int iMonth = dtStart.Month;
                 Expenses monthlyExpenses = new Expenses();
-                foreach (string sTab in sTabs)
+                string myTab = "";
+                try
                 {
-                    Worksheet ws = wb.Worksheets[sTab];
-                    int maxRow = 0;
-                    int i = 3;
-                    while (ws.Cells[ i, 1].Value != null)
+                    foreach (string sTab in sTabs)
                     {
-                        DateTime dtExpense = Convert.ToDateTime(ws.Cells[i, 1].Value);
-                        if (dtStart <= dtExpense && dtExpense <= dtEnd)
+                        myTab = sTab;
+                        Worksheet ws = wb.Worksheets[sTab];
+                        int maxRow = 0;
+                        int i = 3;
+                        while (ws.Cells[i, 1].Value != null)
                         {
-                            string sExpense = ws.Cells[i, 10].Value;
-                            double dExpense = 0.00;
-                            if (ws.Cells[i, 5].Value != null)
+                            DateTime dtExpense = Convert.ToDateTime(ws.Cells[i, 1].Value);
+                            if (dtStart <= dtExpense && dtExpense <= dtEnd)
                             {
-                                dExpense = Convert.ToDouble(ws.Cells[i, 5].Value);
+                                string sExpense = ws.Cells[i, 10].Value;
+                                double dExpense = 0.00;
+                                if (ws.Cells[i, 5].Value != null)
+                                {
+                                    dExpense = Convert.ToDouble(ws.Cells[i, 5].Value);
+                                }
+                                monthlyExpenses.AddExpenses(sExpense, dExpense);
                             }
-                            monthlyExpenses.AddExpenses(sExpense, dExpense);
+                            i++;
                         }
-                        i++;
+                        maxRow = i;
                     }
-                    maxRow = i;
                 }
+                catch (Exception e)
+                {
+                    excel.Quit();
+                    Console.WriteLine("Try Block 1 " + myTab);
+                    Console.WriteLine(e.ToString());
+                    throw;
+                }
+
                 Worksheet wsExp = wb.Worksheets["Expenses"];
                 int j = 1;
                 while (wsExp.Cells[2, j].Value != null)
                 {
                     j++;
                 }
-                for (int k = 2; k < 50; k++)
+                for (int k = 2; k < 51; k++)
                 {
                     switch (k)
                     {
@@ -425,75 +444,78 @@ namespace ExpenseList
                             wsExp.Cells[k, j].Value = monthlyExpenses.LicensingAuto;
                             break;
                         case 26:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.MaintenanceAuto;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.LicensingProfessional;
                             break;
                         case 27:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.MaintenanceHome;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.MaintenanceAuto;
                             break;
                         case 28:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.Medical;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.MaintenanceHome;
                             break;
                         case 29:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.Merchandise;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.Medical;
                             break;
                         case 30:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.Mortgage;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.Merchandise;
                             break;
                         case 31:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.Other;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.Mortgage;
                             break;
                         case 32:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.Parking;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.Other;
                             break;
                         case 33:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.PaymentAuto;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.Parking;
                             break;
                         case 34:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.PaymentCreditCard;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.PaymentAuto;
                             break;
                         case 35:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.Postage;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.PaymentCreditCard;
                             break;
                         case 36:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.ServiceFee;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.Postage;
                             break;
                         case 37:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.Subscription;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.ServiceFee;
                             break;
                         case 38:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.SubscriptionComputer;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.Subscription;
                             break;
                         case 39:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.SubscriptionFitness;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.SubscriptionComputer;
                             break;
                         case 40:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.TaxesFederalIncome;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.SubscriptionFitness;
                             break;
                         case 41:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.TaxesProperty;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.TaxesFederalIncome;
                             break;
                         case 42:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.TaxesSales;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.TaxesProperty;
                             break;
                         case 43:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.TaxesStateIncome;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.TaxesSales;
                             break;
                         case 44:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.Travel;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.TaxesStateIncome;
                             break;
                         case 45:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.UtilityElectric;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.Travel;
                             break;
                         case 46:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.UtilityGas;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.UtilityElectric;
                             break;
                         case 47:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.UtilityPhone;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.UtilityGas;
                             break;
                         case 48:
-                            wsExp.Cells[k, j].Value = monthlyExpenses.UtilitySatellite;
+                            wsExp.Cells[k, j].Value = monthlyExpenses.UtilityPhone;
                             break;
                         case 49:
+                            wsExp.Cells[k, j].Value = monthlyExpenses.UtilitySatellite;
+                            break;
+                        case 50:
                             wsExp.Cells[k, j].Value = monthlyExpenses.UtilityWater;
                             break;
                     }
@@ -510,6 +532,7 @@ namespace ExpenseList
             {
                 excel.Quit();
                 Console.WriteLine(e.ToString());
+                Console.ReadLine();
                 throw;
             } finally
             {
